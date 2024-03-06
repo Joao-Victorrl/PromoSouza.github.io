@@ -3,77 +3,43 @@ document.addEventListener("DOMContentLoaded", function() {
   let autoSlideInterval; // Variável para armazenar o intervalo da troca automática de slides
   const slides = document.querySelectorAll('.slide');
   const totalSlides = slides.length;
-  const buttons = document.querySelectorAll('.manual-btn');
-  let videoPlaying = false; // Variável para controlar se um vídeo está sendo reproduzido atualmente
 
   function showSlide(index) {
-    slides.forEach((slide, i) => {
-      slide.style.display = i === index ? 'block' : 'none';
-    });
+      slides.forEach((slide, i) => {
+          slide.style.display = i === index ? 'block' : 'none';
+      });
 
-    // Se o slide atual for um vídeo
-    if (slides[index].querySelector('video')) {
-      const video = slides[index].querySelector('video');
-      video.play();
-      videoPlaying = true;
+      const currentSlideElement = slides[index];
 
-      // Defina um evento de término para o vídeo
-      video.onended = function() {
-        videoPlaying = false;
-        nextSlide(); // Avança para o próximo slide após o término do vídeo
-      };
-    } else {
-      // Se não for um vídeo, avance para o próximo slide após 6 segundos, apenas se nenhum vídeo estiver sendo reproduzido
-      if (!videoPlaying) {
-        setTimeout(nextSlide, 6000); // Tempo em milissegundos (6 segundos)
+      // Se o slide atual for um vídeo, reproduza-o
+      if (currentSlideElement.querySelector('video')) {
+          const video = currentSlideElement.querySelector('video');
+          video.play();
+
+          // Definir um evento para quando o vídeo terminar
+          video.addEventListener('ended', function() {
+              video.pause(); // Pausa o vídeo
+              video.currentTime = 0; // Reinicia o vídeo
+              nextSlide(); // Avança para o próximo slide após o término do vídeo
+          });
+
+          // Define o tempo de duração do slide igual ao tempo de duração do vídeo
+          const videoDuration = Math.floor(video.duration * 1000); // Duração do vídeo em milissegundos
+          clearInterval(autoSlideInterval); // Limpa o intervalo atual
+          autoSlideInterval = setInterval(nextSlide, videoDuration); // Define o novo intervalo baseado na duração do vídeo
+      } else {
+          // Se for uma imagem, mantenha o intervalo padrão de 6 segundos
+          clearInterval(autoSlideInterval); // Limpa o intervalo atual
+          autoSlideInterval = setInterval(nextSlide, 6000); // Define o novo intervalo para imagens
       }
-    }
-
-    // Adiciona a classe 'active' ao botão correspondente
-    buttons.forEach((btn, i) => {
-      btn.classList.remove('active');
-      if (i === index) {
-        btn.classList.add('active');
-      }
-    });
   }
 
   function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    showSlide(currentSlide);
-  }
-
-  function prevSlide() {
-    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    showSlide(currentSlide);
-  }
-
-  // Mostra a primeira imagem
-  showSlide(currentSlide);
-
-  // Intervalo para trocar de slide a cada 6 segundos (6000ms)
-  autoSlideInterval = setInterval(nextSlide, 6000);
-
-  // Pausar a troca automática de slides enquanto o vídeo estiver sendo reproduzido
-  document.querySelectorAll('.slide video').forEach(video => {
-    video.addEventListener('play', function() {
-      clearInterval(autoSlideInterval);
-    });
-    video.addEventListener('pause', function() {
-      autoSlideInterval = setInterval(nextSlide, 6000);
-    });
-  });
-
-  // Adicionando funcionalidade de troca manual
-  buttons.forEach((btn, index) => {
-    btn.addEventListener('click', function() {
-      currentSlide = index;
+      currentSlide = (currentSlide + 1) % totalSlides;
       showSlide(currentSlide);
-    });
-  });
+  }
 
-  // Adicionando funcionalidade de troca manual anterior
-  document.querySelector('#prevSlide').addEventListener('click', function() {
-    prevSlide();
-  });
+  // Mostra o primeiro slide
+  showSlide(currentSlide);
 });
+
