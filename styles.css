@@ -1,0 +1,81 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.slider {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.slides {
+  width: 500%; /* Ajustado para incluir o vídeo */
+  height: 100%;
+  display: flex;
+}
+
+.slides input {
+  display: none;
+}
+
+.slide {
+  width: 20%; /* Ajustado para 5 slides */
+  height: 100%;
+  position: relative;
+}
+
+.slide img,
+.slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Alterado para 'contain' para manter a proporção */
+}
+
+.manual-navigation {
+  display: none; /* Oculta os botões por padrão */
+  position: absolute;
+  bottom: 10px; /* Ajusta a distância dos botões a partir do fundo da tela */
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.manual-btn {
+  border: 2px solid #1e07eb;
+  padding: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 1s;
+  margin: 0 5px; /* Adiciona um espaçamento entre os botões */
+}
+
+.manual-btn.active {
+  background-color: red; /* Altera a cor de fundo para vermelho quando o botão está ativo */
+}
+
+.manual-btn:not(:last-child){
+  margin-right: 10px;
+}
+
+.manual-btn:hover {
+  background-color: #b61a1a;
+}
+
+/* Oculta os radios em dispositivos menores que 769px (excluindo 768px) */
+@media only screen and (max-width: 768px) {
+  .slides input {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .manual-navigation {
+    display: flex; /* Exibe os botões apenas em dispositivos móveis */
+    bottom: 20px; /* Ajusta a distância dos botões a partir do fundo da tela em dispositivos móveis */
+  }
+}
