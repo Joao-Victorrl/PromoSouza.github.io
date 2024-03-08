@@ -75,7 +75,7 @@ body, html {
 
 @media only screen and (max-width: 768px) {
   .manual-navigation {
-    display: flex; /* Exibe os botões apenas em dispositivos móveis */
+    display: none; /* Exibe os botões apenas em dispositivos móveis */
     bottom: 20px; /* Ajusta a distância dos botões a partir do fundo da tela em dispositivos móveis */
   }
 }
