@@ -1,45 +1,63 @@
 document.addEventListener("DOMContentLoaded", function() {
-  let currentSlide = 0;
-  let autoSlideInterval; // Variável para armazenar o intervalo da troca automática de slides
-  const slides = document.querySelectorAll('.slide');
-  const totalSlides = slides.length;
+    let currentSlide = 0;
+    let startX = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let autoSlideInterval;
 
-  function showSlide(index) {
-      slides.forEach((slide, i) => {
-          slide.style.display = i === index ? 'block' : 'none';
-      });
+    const radioButtons = document.querySelectorAll('input[name="radio-btn"]');
 
-      const currentSlideElement = slides[index];
+    // Adicionando evento de clique para cada botão de rádio
+    radioButtons.forEach((radioBtn, index) => {
+        radioBtn.addEventListener('click', function() {
+            clearInterval(autoSlideInterval); // Limpa o intervalo atual
+            currentSlide = index;
+            showSlide(currentSlide);
+            startAutoSlide(); // Reinicia o avanço automático do slide
+        });
+    });
 
-      // Se o slide atual for um vídeo, reproduza-o
-      if (currentSlideElement.querySelector('video')) {
-          const video = currentSlideElement.querySelector('video');
-          video.play();
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.style.display = i === index ? 'block' : 'none';
+        });
+    }
 
-          // Definir um evento para quando o vídeo terminar
-          video.addEventListener('ended', function() {
-              video.pause(); // Pausa o vídeo
-              video.currentTime = 0; // Reinicia o vídeo
-              nextSlide(); // Avança para o próximo slide após o término do vídeo
-          });
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
+    }
 
-          // Define o tempo de duração do slide igual ao tempo de duração do vídeo
-          const videoDuration = Math.floor(video.duration * 1000); // Duração do vídeo em milissegundos
-          clearInterval(autoSlideInterval); // Limpa o intervalo atual
-          autoSlideInterval = setInterval(nextSlide, videoDuration); // Define o novo intervalo baseado na duração do vídeo
-      } else {
-          // Se for uma imagem, mantenha o intervalo padrão de 6 segundos
-          clearInterval(autoSlideInterval); // Limpa o intervalo atual
-          autoSlideInterval = setInterval(nextSlide, 6000); // Define o novo intervalo para imagens
-      }
-  }
+    function startAutoSlide() {
+        clearInterval(autoSlideInterval); // Limpa o intervalo atual
+        autoSlideInterval = setInterval(nextSlide, 5000); // Define o intervalo para avanço automático
+    }
 
-  function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      showSlide(currentSlide);
-  }
+    // Adicionando detecção de eventos de toque para dispositivos móveis
+    document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+    });
 
-  // Mostra o primeiro slide
-  showSlide(currentSlide);
+    document.addEventListener('touchend', function(e) {
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+
+        if (Math.abs(diffX) > 50) {
+            if (diffX > 0) {
+                // Deslizou para a esquerda
+                nextSlide();
+            } else {
+                // Deslizou para a direita
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+            clearInterval(autoSlideInterval); // Limpa o avanço automático
+            startAutoSlide(); // Reinicia o avanço automático do slide
+        }
+    });
+
+    // Mostra o primeiro slide e inicia o avanço automático
+    showSlide(currentSlide);
+    startAutoSlide();
 });
 
